@@ -1,0 +1,17 @@
+{
+  "name": "คำเรียนรู้",
+  "short_name": "คำเรียนรู้",
+  "description": "เรียนรู้การใช้ภาษาอย่างเหมาะสม",
+  "start_url": "/profiles",
+  "display": "standalone",
+  "background_color": "#0b1837",
+  "theme_color": "#0b1837",
+  "orientation": "landscape",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    }
+  ]
+}
