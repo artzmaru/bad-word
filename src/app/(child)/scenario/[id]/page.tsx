@@ -1,10 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { scenarioData, ScenarioChoiceData } from '@/content/scenario-data'
 import { Character } from '@/components/game'
+import { useAuthStore } from '@/lib/auth/store'
+import { useScenarioCompleteMutation } from '@/lib/mutations/index'
 
 const categoryChip: Record<string, string> = {
   gaming: 'bg-purple-900/60 text-purple-300',
@@ -24,6 +26,9 @@ const situationEmoji: Record<string, string> = {
 
 export default function ScenarioPage({ params }: { params: { id: string } }) {
   const router = useRouter()
+  const activeChildId = useAuthStore((s) => s.activeChildId)
+  const scenarioComplete = useScenarioCompleteMutation()
+  const savedRef = useRef(false)
   const [phase, setPhase] = useState<'situation' | 'choosing' | 'outcome'>('situation')
   const [selectedChoice, setSelectedChoice] = useState<ScenarioChoiceData | null>(null)
 
@@ -108,6 +113,10 @@ export default function ScenarioPage({ params }: { params: { id: string } }) {
               onClick={() => {
                 setSelectedChoice(choice)
                 setPhase('outcome')
+                if (choice.isGoodChoice && activeChildId && !savedRef.current) {
+                  savedRef.current = true
+                  scenarioComplete.mutate({ childId: activeChildId, xpEarned: choice.xpReward })
+                }
               }}
               className="game-card p-4 cursor-pointer active:scale-[0.98] hover:border-sky-500/50 transition-all text-left flex items-center gap-4"
             >
@@ -157,7 +166,7 @@ export default function ScenarioPage({ params }: { params: { id: string } }) {
         <div className="flex gap-3 mt-2">
           {!good && (
             <button
-              onClick={() => setPhase('choosing')}
+              onClick={() => { savedRef.current = false; setPhase('choosing') }}
               className="game-card px-5 py-2.5 text-[var(--text-primary)] font-medium hover:border-[var(--xp-blue)] transition-all text-sm"
             >
               เลือกอีกครั้ง

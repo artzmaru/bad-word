@@ -151,3 +151,37 @@ export function useCompleteQuizSessionMutation() {
     },
   })
 }
+
+export function useQuizCompleteMutation() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ childId, xpEarned }: { childId: string; xpEarned: number }) => {
+      const supabase = createClient()
+      const { error } = await supabase.rpc('increment_quiz_sessions', {
+        p_child_id: childId,
+        p_xp: xpEarned,
+      })
+      if (error) throw error
+    },
+    onSettled: (_data, _err, { childId }) => {
+      qc.invalidateQueries({ queryKey: queryKeys.progress(childId) })
+    },
+  })
+}
+
+export function useScenarioCompleteMutation() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ childId, xpEarned }: { childId: string; xpEarned: number }) => {
+      const supabase = createClient()
+      const { error } = await supabase.rpc('increment_scenarios_completed', {
+        p_child_id: childId,
+        p_xp: xpEarned,
+      })
+      if (error) throw error
+    },
+    onSettled: (_data, _err, { childId }) => {
+      qc.invalidateQueries({ queryKey: queryKeys.progress(childId) })
+    },
+  })
+}

@@ -34,3 +34,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+.vercel
+.env*
+
+# one-time setup scripts (contain secrets)
+scripts/run-migrations.mjs
+scripts/run-fix-schema.mjs
+scripts/fix-scenarios-id.mjs
+scripts/set-vercel-env.mjs

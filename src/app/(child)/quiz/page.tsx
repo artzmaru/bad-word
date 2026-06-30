@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { chestColors } from '@/lib/tokens'
 import { quizData, type QuizQuestionData } from '@/content/quiz-data'
+import { useAuthStore } from '@/lib/auth/store'
+import { useQuizCompleteMutation } from '@/lib/mutations/index'
 
 type Phase = 'idle' | 'question' | 'revealing' | 'summary'
 
@@ -70,6 +72,8 @@ function ChestSVG({
 
 export default function QuizPage() {
   const router = useRouter()
+  const activeChildId = useAuthStore((s) => s.activeChildId)
+  const quizComplete = useQuizCompleteMutation()
   const [phase, setPhase] = useState<Phase>('idle')
   const [localQuestions, setLocalQuestions] = useState<QuizQuestionData[]>([])
   const [currentIdx, setCurrentIdx] = useState(0)
@@ -77,12 +81,21 @@ export default function QuizPage() {
   const [selectedOptionIdx, setSelectedOptionIdx] = useState<number | null>(null)
   const [openingIdx, setOpeningIdx] = useState<number | null>(null)
   const revealTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const savedSummaryRef = useRef(false)
 
   useEffect(() => {
     return () => {
       if (revealTimerRef.current) clearTimeout(revealTimerRef.current)
     }
   }, [])
+
+  useEffect(() => {
+    if (phase === 'summary' && !savedSummaryRef.current && activeChildId) {
+      savedSummaryRef.current = true
+      quizComplete.mutate({ childId: activeChildId, xpEarned: score * 10 })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase, activeChildId])
 
   function startQuiz() {
     const shuffled = [...quizData].sort(() => Math.random() - 0.5).slice(0, 10)
@@ -91,6 +104,7 @@ export default function QuizPage() {
     setAnswers([])
     setSelectedOptionIdx(null)
     setOpeningIdx(null)
+    savedSummaryRef.current = false
     setPhase('question')
   }
 
