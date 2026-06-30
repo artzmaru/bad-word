@@ -6,6 +6,7 @@ import { useEncyclopediaStore } from '@/stores/encyclopediaStore'
 import { useWords, useWordProgress } from '@/lib/queries/words'
 import { useAuthStore } from '@/lib/auth/store'
 import { cn } from '@/lib/utils'
+import PageBackground from '@/components/game/PageBackground'
 
 const LEVEL_COLORS: Record<number, string> = {
   1: 'text-green-400',
@@ -50,7 +51,8 @@ export default function EncyclopediaPage() {
   }, [words, langFilter, levelFilter, searchQuery, tab, progressMap])
 
   return (
-    <div className="h-full flex flex-col overflow-hidden">
+    <div className="relative h-full flex flex-col overflow-hidden">
+      <PageBackground name="background_encyclopedia" />
       <div className="flex-shrink-0 bg-[var(--bg-card)] border-b border-[var(--game-border)] px-4 pt-3 pb-2 space-y-2">
         <div className="flex items-center justify-between">
           <div className="flex gap-2">

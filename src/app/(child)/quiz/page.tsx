@@ -1,19 +1,26 @@
 'use client'
 
+import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
-import { chestColors } from '@/lib/tokens'
 import { quizData, type QuizQuestionData } from '@/content/quiz-data'
 import { useAuthStore } from '@/lib/auth/store'
 import { useQuizCompleteMutation } from '@/lib/mutations/index'
+import PageBackground from '@/components/game/PageBackground'
 
 type Phase = 'idle' | 'question' | 'revealing' | 'summary'
 
 const CHEST_COLORS = ['brown', 'purple', 'red'] as const
 type ChestColor = typeof CHEST_COLORS[number]
 
-function ChestSVG({
+const CHEST_KEY: Record<ChestColor, string> = {
+  brown: 'brown_gold',
+  purple: 'purple',
+  red: 'red_gold',
+}
+
+function ChestImage({
   color,
   isOpen,
   isScaling,
@@ -22,51 +29,27 @@ function ChestSVG({
   isOpen: boolean
   isScaling: boolean
 }) {
-  const palette = chestColors[color]
+  const key = CHEST_KEY[color]
+  const suffix = isOpen ? '_open' : ''
+  const src = `/assets/props/prop_chest_${key}${suffix}@2x.png`
+
   return (
-    <svg
-      width="96"
-      height="80"
-      viewBox="0 0 72 60"
+    <div
       className={cn(
-        'transition-transform duration-300',
+        'relative transition-transform duration-300',
         isScaling && 'scale-110',
         isOpen && !isScaling && 'scale-105',
       )}
+      style={{ width: 96, height: 80 }}
     >
-      <ellipse cx="36" cy="58" rx="28" ry="4" fill="rgba(0,0,0,0.3)" />
-      <rect x="4" y="28" width="64" height="28" rx="3" fill={palette.shadow} />
-      <rect x="4" y="26" width="64" height="28" rx="3" fill={palette.bg} />
-      <rect x="6" y="28" width="60" height="4" rx="1" fill={palette.label} opacity="0.3" />
-      <rect x="28" y="34" width="16" height="12" rx="2" fill={palette.shadow} />
-      <rect x="29" y="33" width="14" height="12" rx="2" fill={palette.label} opacity="0.8" />
-      <circle cx="36" cy="38" r="3" fill={palette.shadow} />
-      <rect x="34" y="39" width="4" height="4" rx="1" fill={palette.shadow} />
-      <g
-        style={{
-          transform: isOpen
-            ? 'rotate(-100deg) translateY(-2px)'
-            : isScaling
-            ? 'rotate(-60deg)'
-            : 'rotate(0deg)',
-          transformOrigin: '36px 28px',
-          transition: 'transform 0.4s cubic-bezier(0.34,1.56,0.64,1)',
-        }}
-      >
-        <rect x="4" y="8" width="64" height="22" rx="3" fill={palette.shadow} />
-        <rect x="4" y="6" width="64" height="22" rx="3" fill={palette.bg} />
-        <rect x="6" y="8" width="60" height="4" rx="1" fill={palette.label} opacity="0.3" />
-        <rect x="12" y="6" width="6" height="22" rx="1" fill={palette.shadow} opacity="0.5" />
-        <rect x="54" y="6" width="6" height="22" rx="1" fill={palette.shadow} opacity="0.5" />
-      </g>
-      {isOpen && (
-        <g>
-          <circle cx="20" cy="20" r="3" fill="#f5c842" opacity="0.8" />
-          <circle cx="52" cy="16" r="2" fill="#f5c842" opacity="0.7" />
-          <circle cx="36" cy="10" r="4" fill="#f5c842" opacity="0.9" />
-        </g>
-      )}
-    </svg>
+      <Image
+        src={src}
+        alt={`chest ${color}`}
+        fill
+        className="object-contain"
+        sizes="96px"
+      />
+    </div>
   )
 }
 
@@ -139,7 +122,8 @@ export default function QuizPage() {
 
   if (phase === 'idle') {
     return (
-      <div className="h-full flex flex-col items-center justify-center gap-6">
+      <div className="relative h-full flex flex-col items-center justify-center gap-6">
+        <PageBackground name="background_quiz_arena" />
         <div className="game-card p-10 flex flex-col items-center gap-5 max-w-sm w-full mx-4">
           <div className="text-7xl">🎯</div>
           <div className="text-center">
@@ -160,7 +144,8 @@ export default function QuizPage() {
   if (phase === 'summary') {
     const excellent = score >= 8
     return (
-      <div className="h-full flex flex-col items-center justify-center gap-6 px-4">
+      <div className="relative h-full flex flex-col items-center justify-center gap-6 px-4">
+        <PageBackground name="background_quiz_arena" />
         <div className="game-card p-10 flex flex-col items-center gap-5 max-w-sm w-full">
           <div className="text-6xl">🏆</div>
           <h2 className="text-2xl font-bold text-[var(--text-primary)]">จบแบบทดสอบ!</h2>
@@ -201,7 +186,8 @@ export default function QuizPage() {
   const correctIdx = q.options.findIndex((o) => o.isCorrect)
 
   return (
-    <div className="h-full flex flex-col p-4 gap-3">
+    <div className="relative h-full flex flex-col p-4 gap-3">
+      <PageBackground name="background_quiz_arena" />
       <div className="game-card px-5 py-3 flex items-center gap-4">
         <span className="text-[var(--text-muted)] text-sm font-semibold whitespace-nowrap">
           ข้อ {currentIdx + 1} / 10
@@ -284,7 +270,7 @@ export default function QuizPage() {
                   ringClass,
                 )}
               >
-                <ChestSVG
+                <ChestImage
                   color={color}
                   isOpen={isOpen}
                   isScaling={isOpening}

@@ -1,4 +1,5 @@
 export { default as MinecraftFace } from './MinecraftFace'
+export { default as PageBackground } from './PageBackground'
 export type { FaceExpression } from './MinecraftFace'
 
 export { default as LevelBadge } from './LevelBadge'

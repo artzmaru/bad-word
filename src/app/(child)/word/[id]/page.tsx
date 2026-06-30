@@ -8,6 +8,7 @@ import { useMarkWordSeenMutation, useMarkWordLearnedMutation } from '@/lib/mutat
 import { useAuthStore } from '@/lib/auth/store'
 import { cn } from '@/lib/utils'
 import type { Tables } from '@/lib/supabase/database.types'
+import PageBackground from '@/components/game/PageBackground'
 
 type WordDetail = Tables<'word_details'>
 
@@ -79,7 +80,8 @@ export default function WordDetailPage({ params }: { params: { id: string } }) {
   }
 
   return (
-    <div className="h-full overflow-y-auto pb-24">
+    <div className="relative h-full overflow-y-auto pb-24">
+      <PageBackground name="background_word_detail" />
       <div className="px-6 pt-4 pb-8 max-w-2xl mx-auto">
         <button
           onClick={() => router.back()}
@@ -95,6 +97,7 @@ export default function WordDetailPage({ params }: { params: { id: string } }) {
             faceColor={word.face_base}
             shadowColor={word.face_shadow}
             highlightColor={word.face_highlight}
+            wordKey={word.lang === 'en' ? word.word.toLowerCase() : `level_${word.level}_${word.face_expression}`}
           />
           <div className="text-center">
             <h1 className="text-3xl font-bold text-[var(--text-primary)] mb-2">{word.word}</h1>

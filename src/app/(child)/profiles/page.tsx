@@ -1,14 +1,44 @@
 'use client'
 
+import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useAuthStore } from '@/lib/auth/store'
 import { cn } from '@/lib/utils'
 import { type ChildProfile } from '@/lib/queries/progress'
+import PageBackground from '@/components/game/PageBackground'
 
-const AVATARS = ['🐶', '🐱', '🐸', '🦊', '🐼', '🐨']
+const CHARACTER_AVATARS = [
+  { id: 'fifok',    label: 'ฟิฟ่อก',   src: '/assets/profiles/avatar_fifok_idle@2x.png',    selectedSrc: '/assets/profiles/avatar_fifok_selected@2x.png' },
+  { id: 'noon',     label: 'นุ่น',      src: '/assets/profiles/avatar_noon_idle@2x.png',     selectedSrc: '/assets/profiles/avatar_noon_selected@2x.png' },
+  { id: 'nong_guy', label: 'น้องกาย', src: '/assets/profiles/avatar_nong_guy_idle@2x.png', selectedSrc: '/assets/profiles/avatar_nong_guy_selected@2x.png' },
+]
 const COLORS = ['#38bdf8', '#22c55e', '#f59e0b', '#a78bfa', '#f43f5e', '#fb923c']
+
+function ProfileAvatar({ avatar, color, size = 96 }: { avatar: string; color: string; size?: number }) {
+  const ch = CHARACTER_AVATARS.find((c) => c.id === avatar)
+  if (ch) {
+    return (
+      <div
+        className="rounded-2xl overflow-hidden flex items-center justify-center shadow-lg"
+        style={{ width: size, height: size, background: `${color}20`, border: `2px solid ${color}` }}
+      >
+        <div className="relative w-full h-full">
+          <Image src={ch.src} alt={ch.label} fill className="object-contain p-1" sizes={`${size}px`} />
+        </div>
+      </div>
+    )
+  }
+  return (
+    <div
+      className="rounded-2xl flex items-center justify-center text-5xl shadow-lg"
+      style={{ width: size, height: size, background: `${color}20`, border: `2px solid ${color}` }}
+    >
+      {avatar}
+    </div>
+  )
+}
 
 export default function ProfilesPage() {
   const [profiles, setProfiles] = useState<ChildProfile[]>([])
@@ -16,7 +46,7 @@ export default function ProfilesPage() {
   const [user, setUser] = useState<{ id: string } | null>(null)
   const [showAdd, setShowAdd] = useState(false)
   const [newName, setNewName] = useState('')
-  const [newAvatar, setNewAvatar] = useState('🐶')
+  const [newAvatar, setNewAvatar] = useState('fifok')
   const [newColor, setNewColor] = useState('#38bdf8')
   const [adding, setAdding] = useState(false)
 
@@ -89,10 +119,8 @@ export default function ProfilesPage() {
   }
 
   return (
-    <div
-      className="flex flex-col items-center justify-center h-full gap-8 px-8 overflow-y-auto"
-      style={{ background: 'var(--bg-page)' }}
-    >
+    <div className="relative flex flex-col items-center justify-center h-full gap-8 px-8 overflow-y-auto">
+      <PageBackground name="background_profile_selection" overlay="rgba(10,14,30,0.55)" />
       <div className="text-center">
         <h1 className="text-3xl font-bold text-[var(--text-primary)]">คำเรียนรู้</h1>
         <p className="text-[var(--text-muted)] mt-1">เลือกโปรไฟล์</p>
@@ -109,11 +137,8 @@ export default function ProfilesPage() {
               border: `2px solid ${profile.color}30`,
             }}
           >
-            <div
-              className="w-24 h-24 rounded-2xl flex items-center justify-center text-5xl shadow-lg transition-transform group-hover:scale-110"
-              style={{ background: `${profile.color}20`, borderColor: profile.color, border: `2px solid ${profile.color}` }}
-            >
-              {profile.avatar}
+            <div className="transition-transform group-hover:scale-110">
+              <ProfileAvatar avatar={profile.avatar} color={profile.color} size={96} />
             </div>
             <span className="text-[var(--text-primary)] font-bold text-lg">{profile.name}</span>
           </button>
@@ -152,21 +177,30 @@ export default function ProfilesPage() {
             />
 
             <div>
-              <p className="text-[var(--text-muted)] text-sm mb-2">อวาตาร์</p>
-              <div className="flex gap-2 flex-wrap">
-                {AVATARS.map((a) => (
+              <p className="text-[var(--text-muted)] text-sm mb-2">เลือกตัวละคร</p>
+              <div className="flex gap-3 justify-center">
+                {CHARACTER_AVATARS.map((ch) => (
                   <button
-                    key={a}
+                    key={ch.id}
                     type="button"
-                    onClick={() => setNewAvatar(a)}
+                    onClick={() => setNewAvatar(ch.id)}
                     className={cn(
-                      'w-10 h-10 rounded-lg text-xl transition-all',
-                      newAvatar === a
-                        ? 'bg-[var(--xp-blue)] scale-110'
+                      'flex flex-col items-center gap-1 p-2 rounded-xl transition-all',
+                      newAvatar === ch.id
+                        ? 'bg-[var(--xp-blue)]/30 ring-2 ring-[var(--xp-blue)] scale-110'
                         : 'bg-[var(--bg-elevated)]'
                     )}
                   >
-                    {a}
+                    <div className="relative w-14 h-14">
+                      <Image
+                        src={newAvatar === ch.id ? ch.selectedSrc : ch.src}
+                        alt={ch.label}
+                        fill
+                        className="object-contain"
+                        sizes="56px"
+                      />
+                    </div>
+                    <span className="text-[var(--text-muted)] text-xs">{ch.label}</span>
                   </button>
                 ))}
               </div>

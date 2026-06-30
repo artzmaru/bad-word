@@ -7,6 +7,7 @@ import { useProgressStore, selectXPProgress } from '@/stores/progressStore'
 import { useChildProgress, useChildProfiles } from '@/lib/queries/progress'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import PageBackground from '@/components/game/PageBackground'
 
 export default function HomePage() {
   const activeChildId = useAuthStore((s) => s.activeChildId)
@@ -58,7 +59,8 @@ export default function HomePage() {
   ]
 
   return (
-    <div className="h-full overflow-y-auto flex flex-col gap-6 p-6">
+    <div className="relative h-full overflow-y-auto flex flex-col gap-6 p-6">
+      <PageBackground name="background_home_world" />
       {/* XP Bar */}
       <div className="game-card p-4 flex flex-col gap-2">
         <div className="flex items-center justify-between">

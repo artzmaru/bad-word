@@ -7,6 +7,7 @@ import { scenarioData, ScenarioChoiceData } from '@/content/scenario-data'
 import { Character } from '@/components/game'
 import { useAuthStore } from '@/lib/auth/store'
 import { useScenarioCompleteMutation } from '@/lib/mutations/index'
+import PageBackground from '@/components/game/PageBackground'
 
 const categoryChip: Record<string, string> = {
   gaming: 'bg-purple-900/60 text-purple-300',
@@ -50,7 +51,8 @@ export default function ScenarioPage({ params }: { params: { id: string } }) {
 
   if (phase === 'situation') {
     return (
-      <div className="h-full flex gap-6 p-6">
+      <div className="relative h-full flex gap-6 p-6">
+        <PageBackground name="background_scenario_forest" />
         <div className="flex-1 flex flex-col">
           <button
             onClick={() => router.back()}
@@ -98,7 +100,8 @@ export default function ScenarioPage({ params }: { params: { id: string } }) {
 
   if (phase === 'choosing') {
     return (
-      <div className="h-full flex flex-col py-4">
+      <div className="relative h-full flex flex-col py-4">
+        <PageBackground name="background_scenario_forest" />
         <h2 className="text-center text-[var(--text-primary)] font-bold text-lg pb-2">
           เลือกสิ่งที่คุณจะพูด...
         </h2>
@@ -140,7 +143,8 @@ export default function ScenarioPage({ params }: { params: { id: string } }) {
     const good = selectedChoice.isGoodChoice
 
     return (
-      <div className="h-full flex flex-col items-center justify-center px-6 py-6 gap-4">
+      <div className="relative h-full flex flex-col items-center justify-center px-6 py-6 gap-4">
+        <PageBackground name="background_scenario_forest" />
         <Character
           mood={good ? 'happy' : 'sad'}
           color={good ? '#22c55e' : '#ef4444'}
